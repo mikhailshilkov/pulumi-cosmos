@@ -9,22 +9,25 @@ import { buildVMScaleSetApp } from "./vms";
 // Expecting a comma-separated list, e.g., "westus,eastus,westeurope"
 const locations = new pulumi.Config().require("locations").split(",");
 
-const resourceGroup = new azure.core.ResourceGroup("UrlShorterner", {
+const resourceGroup = new azure.core.ResourceGroup("globalcosmos-rg", {
     location: locations[0],
 });
 
+// Cosmos DB + Azure Functions
 const functions = new GlobalApp("functions", {
     resourceGroup,
     locations,
     factory: buildFunctionApp,
 });
 
+// Cosmos DB + Azure Container Instances
 const aci = new GlobalApp("aci", {
     resourceGroup,
     locations,
     factory: buildContainerApp,
 });
 
+// Cosmos DB + Azure VM Scale Sets
 const vmss = new GlobalApp("vms", {
     resourceGroup,
     locations,
