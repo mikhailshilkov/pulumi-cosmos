@@ -30,12 +30,12 @@ Each region has its own Azure Functions App with an HTTP Function. The Function'
 
 ## Containers
 
-In addition to per-region setup, `GlobalApp` allows to deploy some infrastructure that is shared between regions. Container-hosted application stores its docker image in a shared Container Registry:
+In addition to per-region setup, `GlobalApp` allows to deploy some infrastructure that is shared between regions. [Container-hosted application](https://github.com/mikhailshilkov/pulumi-cosmos/blob/master/aci.ts) stores its docker image in a shared Container Registry:
 
 ![Container Instances](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/containers.png)
 
 ## Virtual Machines
 
-The infrastructure in each region can be as simple or as complicated as needed. The VM-based example deploys a Virtual Network, a subnet, a Load Balancer, a VM Scale Set, and autoscaling rules, all wired together to handle HTTP requests:
+The infrastructure in each region can be as simple or as complicated as needed. The [VM-based example](https://github.com/mikhailshilkov/pulumi-cosmos/blob/master/vms.ts) deploys a Virtual Network, a subnet, a Load Balancer, a VM Scale Set, and autoscaling rules, all wired together to handle HTTP requests:
 
 ![VM Scale Sets](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/vmscalesets.png)
