@@ -13,7 +13,7 @@ The application shows several notable features:
 
 The [`GlobalApp`](https://github.com/mikhailshilkov/pulumi-cosmos/blob/master/globalApp.ts) define a skeleton for the application. While it does not limit the type of compute infrastructure, it creates the multi-regional pieces of the infrastructure:
 
-![Global App](https://github.com/mikhailshilkov/pulumi-cosmos/tree/master/pictures/globalapp.png)
+![Global App](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/globalapp.png)
 
 The application has three example of using this component with the following compute services:
 - Azure Functions
@@ -22,12 +22,12 @@ The application has three example of using this component with the following com
 
 ## Serverless
 
-![Function App](https://github.com/mikhailshilkov/pulumi-cosmos/tree/master/pictures/functions.png)
+![Function App](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/functions.png)
 
 ## Containers
 
-![Container Instances](https://github.com/mikhailshilkov/pulumi-cosmos/tree/master/pictures/containers.png)
+![Container Instances](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/containers.png)
 
 ## Virtual Machines
 
-![VM Scale Sets](https://github.com/mikhailshilkov/pulumi-cosmos/tree/master/pictures/vmscalesets.png)
+![VM Scale Sets](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/vmscalesets.png)
