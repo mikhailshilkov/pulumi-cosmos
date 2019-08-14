@@ -22,12 +22,20 @@ The application has three example of using this component with the following com
 
 ## Serverless
 
+The [Functions example](https://github.com/mikhailshilkov/pulumi-cosmos/blob/master/functionApp.ts) uses serverless functions as Pulumi callbacks to mix the application code into the infrastructure definition:
+
 ![Function App](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/functions.png)
 
+Each region has its own Azure Functions App with an HTTP Function. The Function's endpoint is linked to the Traffic Manager.
+
 ## Containers
+
+In addition to per-region setup, `GlobalApp` allows to deploy some infrastructure that is shared between regions. Container-hosted application stores its docker image in a shared Container Registry:
 
 ![Container Instances](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/containers.png)
 
 ## Virtual Machines
+
+The infrastructure in each region can be as simple or as complicated as needed. The VM-based example deploys a Virtual Network, a subnet, a Load Balancer, a VM Scale Set, and autoscaling rules, all wired together to handle HTTP requests:
 
 ![VM Scale Sets](https://github.com/mikhailshilkov/pulumi-cosmos/raw/master/pictures/vmscalesets.png)
