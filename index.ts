@@ -9,7 +9,7 @@ import { buildVMScaleSetApp } from "./vms";
 // Expecting a comma-separated list, e.g., "westus,eastus,westeurope"
 const locations = new pulumi.Config().require("locations").split(",");
 
-const resourceGroup = new azure.core.ResourceGroup("globalcosmos-rg", {
+const resourceGroup = new azure.core.ResourceGroup("UrlShorterner", {
     location: locations[0],
 });
 
@@ -32,6 +32,7 @@ const vmss = new GlobalApp("vms", {
     resourceGroup,
     locations,
     factory: buildVMScaleSetApp,
+    enableMultiMaster: true,
 });
 
 export const functionsEndpoint = pulumi.interpolate`${functions.endpoint}/cosmos`;

@@ -26,6 +26,7 @@ export interface GlobalAppArgs {
     resourceGroup: azure.core.ResourceGroup;
     locations: pulumi.Input<pulumi.Input<string>[]>;
     factory: BuildLocationFactory;
+    enableMultiMaster?: boolean;
 }
 
 export class GlobalApp extends pulumi.ComponentResource {
@@ -52,6 +53,7 @@ export class GlobalApp extends pulumi.ComponentResource {
                 maxIntervalInSeconds: 5,
                 maxStalenessPrefix: 100,
             },
+            enableMultipleWriteLocations: args.enableMultiMaster,
         }, parentOpts);
 
         // Traffic Manager as a global HTTP endpoint

@@ -28,6 +28,8 @@ write_files:
       const cosmos = require('@azure/cosmos');
       const endpoint = process.env.ENDPOINT;
       const key = process.env.MASTER_KEY;
+      const database = process.env.DATABASE;
+      const collection = process.env.COLLECTION;
       const preferredLocations = [process.env.LOCATION];
       const connectionPolicy = { preferredLocations };
       const client = new cosmos.CosmosClient({ endpoint, key, connectionPolicy });
@@ -40,26 +42,12 @@ write_files:
       })
       app.get('/cosmos', (req, res) => {
         client
-          .database('thedb')
-          .container('urls')
+          .database(database)
+          .container(collection)
           .item('test', undefined)
           .read()
           .then(r => res.send(r.resource))
           .catch(err => res.status(500).send(err));
-      })
-      app.get('/cosmosinit', async (req, res) => {
-        const client = new cosmos.CosmosClient({ endpoint, key, connectionPolicy });
-        var id = 'thedb';
-        const result = await client.databases.createIfNotExists({ id });
-        const db = result.database;
-        var id = 'urls';
-        const { container } = await db.containers.createIfNotExists({ id });
-        try {
-          const r = await container.item('test', undefined).read();
-          res.send(r.resource);
-        } catch (err) {
-          res.status(500).send(err);
-        }
       })
       app.get('/api/ping', (req, res) => {
         res.send('Ack')
@@ -70,6 +58,8 @@ write_files:
 runcmd:
   - export ENDPOINT="${ENDPOINT}"
   - export MASTER_KEY="${MASTER_KEY}"
+  - export DATABASE="${DATABASE}"
+  - export COLLECTION="${COLLECTION}"
   - export LOCATION="${LOCATION}"
   - service nginx restart
   - cd "/home/azureuser/myapp"

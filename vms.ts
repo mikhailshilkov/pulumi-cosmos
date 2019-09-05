@@ -6,6 +6,17 @@ import { GlobalContext, RegionalContext } from "./globalApp";
 export function buildVMScaleSetApp({ resourceGroup, cosmosdb, opts }: GlobalContext) {
     const file = readFileSync("./vmCustomData.yaml").toString();
 
+    const database = new azure.cosmosdb.SqlDatabase("vms-db", {
+        resourceGroupName: resourceGroup.name,
+        accountName: cosmosdb.name,
+    }, opts);
+
+    const collection = new azure.cosmosdb.SqlContainer("vms-items", {
+        resourceGroupName: resourceGroup.name,
+        accountName: cosmosdb.name,
+        databaseName: database.name,
+    }, opts);
+
     return ({ location }: RegionalContext) => {
         const publicIp = new azure.network.PublicIp(`pip-${location}`, {
             resourceGroupName: resourceGroup.name,
@@ -54,10 +65,12 @@ export function buildVMScaleSetApp({ resourceGroup, cosmosdb, opts }: GlobalCont
             virtualNetworkName: vnet.name,
         }, opts);
 
-        const customData = pulumi.all([cosmosdb.endpoint, cosmosdb.primaryMasterKey])
-            .apply(([endpoint, key]) => {
+        const customData = pulumi.all([cosmosdb.endpoint, cosmosdb.primaryMasterKey, database.name, collection.name])
+            .apply(([endpoint, key, databaseName, collectionName]) => {
                 const s = file.replace("${ENDPOINT}", endpoint)
                     .replace("${MASTER_KEY}", key)
+                    .replace("${DATABASE}", databaseName)
+                    .replace("${COLLECTION}", collectionName)
                     .replace("${LOCATION}", location);
                 return s;
             });

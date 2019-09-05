@@ -2,20 +2,6 @@ const express = require('express');
 const morgan = require('morgan');
 const cosmos = require('@azure/cosmos');
 
-async function getContainer(endpoint, masterKey, region) {
-    const client = new cosmos.CosmosClient({
-        endpoint,
-        key: masterKey,
-        connectionPolicy: {
-            preferredLocations: [region],
-        },
-    });
-
-    const { database: db } = await client.databases.createIfNotExists({ id: "thedb" });
-    const { container } = await db.containers.createIfNotExists({ id: "urls" });
-    return container;
-}
-
 const app = express();
 app.use(morgan('combined'));
 
@@ -26,10 +12,13 @@ app.get('/', (req, res) => {
 
 app.get('/cosmos', async (req, res) => {
   const endpoint = process.env.ENDPOINT;
-  const masterKey = process.env.MASTER_KEY;
+  const key = process.env.MASTER_KEY;
+  const database = process.env.DATABASE;
+  const collection = process.env.COLLECTION;
   const location = process.env.LOCATION;
 
-  let container = await getContainer(endpoint, masterKey, location);
+  const client = new cosmos.CosmosClient({ endpoint, key, connectionPolicy: { preferredLocations: [location] } });
+  const container = client.database(database).container(collection);
   const response = await container.item("test", undefined).read();
 
   if (response.resource && response.resource.url) {

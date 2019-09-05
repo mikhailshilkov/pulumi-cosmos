@@ -23,6 +23,17 @@ export function buildContainerApp({ resourceGroup, cosmosdb, opts }: GlobalConte
         },
     }, opts);
 
+    const database = new azure.cosmosdb.SqlDatabase("aci-db", {
+        resourceGroupName: resourceGroup.name,
+        accountName: cosmosdb.name,
+    }, opts);
+
+    const collection = new azure.cosmosdb.SqlContainer("aci-items", {
+        resourceGroupName: resourceGroup.name,
+        accountName: cosmosdb.name,
+        databaseName: database.name,
+    }, opts);
+
     return ({ location }: RegionalContext) => {
         const group = new azure.containerservice.Group(`aci-${location}`, {
             resourceGroupName: resourceGroup.name,
@@ -46,6 +57,8 @@ export function buildContainerApp({ resourceGroup, cosmosdb, opts }: GlobalConte
                     environmentVariables: {
                         ENDPOINT: cosmosdb.endpoint,
                         MASTER_KEY: cosmosdb.primaryMasterKey,
+                        DATABASE: database.name,
+                        COLLECTION: collection.name,
                         LOCATION: location,
                     },
                 },

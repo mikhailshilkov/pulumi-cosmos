@@ -1,9 +1,19 @@
-import { Container } from "@azure/cosmos";
+import { CosmosClient } from "@azure/cosmos";
 import * as azure from "@pulumi/azure";
-import { getContainer } from "./cosmosclient";
 import { GlobalContext, RegionalContext } from "./globalApp";
 
 export function buildFunctionApp({ resourceGroup, cosmosdb, opts }: GlobalContext) {
+    const database = new azure.cosmosdb.SqlDatabase("functions-db", {
+        resourceGroupName: resourceGroup.name,
+        accountName: cosmosdb.name,
+    }, opts);
+
+    const collection = new azure.cosmosdb.SqlContainer("functions-items", {
+        resourceGroupName: resourceGroup.name,
+        accountName: cosmosdb.name,
+        databaseName: database.name,
+    }, opts);
+
     return ({ location }: RegionalContext) => {
         const fn = new azure.appservice.HttpEventSubscription(`GetUrl-${location}`, {
             resourceGroup,
@@ -17,13 +27,14 @@ export function buildFunctionApp({ resourceGroup, cosmosdb, opts }: GlobalContex
                 },
             },
             callbackFactory: () => {
-                const endpoint = cosmosdb.endpoint.get();
-                const masterKey = cosmosdb.primaryMasterKey.get();
+                const client = new CosmosClient({
+                    endpoint: cosmosdb.endpoint.get(),
+                    key: cosmosdb.primaryMasterKey.get(),
+                    connectionPolicy: { preferredLocations: [location] },
+                });
+                const container = client.database(database.name.get()).container(collection.name.get());
 
-                let container: Container;
                 return async (_, request: azure.appservice.HttpRequest) => {
-                    container = container || await getContainer(endpoint, masterKey, location);
-
                     const key = request.params.key;
                     if (key === "ping") {
                         // Handle traffic manager live pings
@@ -38,7 +49,7 @@ export function buildFunctionApp({ resourceGroup, cosmosdb, opts }: GlobalContex
                             : { status: 404, body: "" };
                     } catch (e) {
                         // Cosmos SDK throws an error for non-existing documents
-                        return { status: 404, body: "" };
+                        return { status: 404, body: e };
                     }
                 };
             },
